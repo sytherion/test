@@ -1,10 +1,16 @@
+package tictactoe;
+
 import java.util.Scanner;
 /**
  * Tic-Tac-Toe: Two-player console, non-graphics, non-OO version.
  * All variables/methods are declared as static (belong to the class)
  *  in the non-OO version.
+ *  30-05-2019 simple enhancement by Andreas
+ *  	1. Make scalable
+ *  	2. Add input validation
+ *  	3. change class name TTTConsoleNonOO2P -> Tictactoe
  */
-public class TTTConsoleNonOO2P {
+public class Tictactoe {
    // Name-constants to represent the seeds and cell contents
    public static final int EMPTY = 0;
    public static final int CROSS = 1;
@@ -17,9 +23,13 @@ public class TTTConsoleNonOO2P {
    public static final int NOUGHT_WON = 3;
  
    // The game board and the game status
-   public static final int ROWS = 3, COLS = 3; // number of rows and columns
-   public static int[][] board = new int[ROWS][COLS]; // game board in 2D array
+   //public static final int ROWS = 3, COLS = 3; // number of rows and columns //Obsolete
+   //public static int[][] board = new int[ROWS][COLS];  //Obsolete
+   //start Andreas 30-05-2019
+   public static int ROWS, COLS; // number of rows and columns
+   public static int[][] board ; // game board in 2D array
                                                       //  containing (EMPTY, CROSS, NOUGHT)
+   //end Andreas 30-05-2019
    public static int currentState;  // the current state of the game
                                     // (PLAYING, DRAW, CROSS_WON, NOUGHT_WON)
    public static int currentPlayer; // the current player (CROSS or NOUGHT)
@@ -30,7 +40,14 @@ public class TTTConsoleNonOO2P {
    /** The entry main method (the program starts here) */
    public static void main(String[] args) {
       // Initialize the game-board and current status
-      initGame();
+	  // //start Andreas 30-05-2019
+	  System.out.print("Please select the grid: ");
+      int scale = getInput();
+      ROWS = scale; 
+      COLS = scale;
+      board = new int[ROWS][COLS];
+      //end Andreas 30-05-2019
+	  initGame();
       // Play the game once
       do {
          playerMove(currentPlayer); // update currentRow and currentCol
@@ -66,12 +83,14 @@ public class TTTConsoleNonOO2P {
       boolean validInput = false;  // for input validation
       do {
          if (theSeed == CROSS) {
-            System.out.print("Player 'X', enter your move (row[1-3] column[1-3]): ");
+        	//System.out.print("Player 'X', enter your move (row[1-3] column[1-3]): ");
+            System.out.print("Player 'X', enter your move (row[1-"+ROWS+"] column[1-"+COLS+"]): "); //Andreas 30-05-2019
          } else {
-            System.out.print("Player 'O', enter your move (row[1-3] column[1-3]): ");
+        	//System.out.print("Player 'O', enter your move (row[1-3] column[1-3]): ");
+            System.out.print("Player 'O', enter your move (row[1-"+ROWS+"] column[1-"+COLS+"]): "); //Andreas 30-05-2019
          }
-         int row = in.nextInt() - 1;  // array index starts at 0 instead of 1
-         int col = in.nextInt() - 1;
+         int row = getInput() - 1;  // array index starts at 0 instead of 1
+         int col = getInput() - 1;
          if (row >= 0 && row < ROWS && col >= 0 && col < COLS && board[row][col] == EMPTY) {
             currntRow = row;
             currentCol = col;
@@ -110,6 +129,7 @@ public class TTTConsoleNonOO2P {
  
    /** Return true if the player with "theSeed" has won after placing at
        (currentRow, currentCol) */
+   /*Obsolete
    public static boolean hasWon(int theSeed, int currentRow, int currentCol) {
       return (board[currentRow][0] == theSeed         // 3-in-the-row
                    && board[currentRow][1] == theSeed
@@ -125,7 +145,36 @@ public class TTTConsoleNonOO2P {
                    && board[0][2] == theSeed
                    && board[1][1] == theSeed
                    && board[2][0] == theSeed);
-   }
+   }*/
+   //Start Andreas 30-05-2019 -> change winning condition logic to scalable 
+   public static  boolean hasWon(int theSeed, int currentRow, int currentCol) {
+	   boolean a= true,b= true,c= true,d = true;
+	   for(int x = 0; x < ROWS; ++x) {    // n-in-the-row
+		   if(board[currentRow][x] != theSeed) {
+			   a = false;
+		   }
+	   }
+	   for(int x = 0; x < ROWS; ++x) {    // n-in-the-column
+		   if(board[x][currentCol] != theSeed) {
+			   b = false;
+		   }
+	   }
+	   for(int x = 0; x < ROWS; ++x) {    // n-in-the-diagonal
+		   if(board[x][x] != theSeed) {
+			   c = false;
+		   }
+	   }
+	   for(int x = 0; x < ROWS; ++x) {    // n-in-the-opposite-diagonal
+		   if(board[x][ROWS-1-x] != theSeed) {
+			   d = false;
+		   }
+	   }
+	   if (a||b||c||d) {
+		   return true;
+	   }else {
+		   return false;
+	   }
+   }//end Andreas 30-05-2019
  
    /** Print the game board */
    public static void printBoard() {
@@ -152,4 +201,16 @@ public class TTTConsoleNonOO2P {
          case CROSS:  System.out.print(" X "); break;
       }
    }
+   
+   //start Andreas 30-05-2019 -> add validation for number only
+   public static int getInput() {
+	   int i = 0;
+       while (!in.hasNextInt()) {
+           System.out.println("Please input number only!");
+           in.next(); 
+       }
+	   i = in.nextInt();
+	   return i;
+   }
+   //end Andreas 30-05-2019
 }
